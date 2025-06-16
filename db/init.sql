@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id SERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id),
+    category VARCHAR(50) NOT NULL,
+    UNIQUE(user_id, category)
+);
+
+CREATE TABLE IF NOT EXISTS sent_articles (
+    id SERIAL PRIMARY KEY,
+    url VARCHAR(255) NOT NULL UNIQUE,
+    category VARCHAR(50) NOT NULL,
+    sent_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

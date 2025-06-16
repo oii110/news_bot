@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_AUTH_KEY=${BOT_AUTH_KEY}
+      - STORAGE_USERNAME=postgres
+      - STORAGE_PASSWORD=postgres
+      - STORAGE_HOST=postgres
+      - STORAGE_PORT=5432
+      - STORAGE_DATABASE=tgbot
+    depends_on:
+      - postgres
+    networks:
+      - tgbot-network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=newsbot
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - tgbot-network
+
+volumes:
+  postgres-data:
+
+networks:
+  tgbot-network:
+    driver: bridge
