@@ -4,22 +4,19 @@ import (
 	"context"
 	"sort"
 	"tgbot/internal/entities"
-	"tgbot/internal/repository"
-	"tgbot/internal/service"
 )
 
 type NewsUsecase struct {
-	newsService *service.NewsAPIService
-	sentRepo    *repository.SentArticlesRepository
+	newsService NewsServiceInterface
+	sentRepo    SentArticlesRepositoryInterface
 }
 
-func NewNewsUsecase(newsService *service.NewsAPIService, sentRepo *repository.SentArticlesRepository) *NewsUsecase {
+func NewNewsUsecase(newsService NewsServiceInterface, sentRepo SentArticlesRepositoryInterface) *NewsUsecase {
 	return &NewsUsecase{
 		newsService: newsService,
 		sentRepo:    sentRepo,
 	}
 }
-
 func (u *NewsUsecase) GetNewsByCategory(ctx context.Context, category string) ([]entities.Article, error) {
 	articles, err := u.newsService.GetNewsByCategory(ctx, category)
 	if err != nil {
