@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"tgbot/internal/adapters"
 	"tgbot/internal/config"
 	"tgbot/internal/repository"
 	"tgbot/internal/service"
@@ -38,6 +39,7 @@ func main() {
 		log.Fatal("Ошибка при создании Telegram-бота:", err)
 	}
 
-	botUsecase := usecases.NewBotUsecase(bot, subscriptionUsecase, newsUsecase, categories)
+	wrappedBot := &adapters.BotWrapper{Bot: bot}
+	botUsecase := usecases.NewBotUsecase(wrappedBot, subscriptionUsecase, newsUsecase, categories)
 	botUsecase.StartBot(ctx)
 }

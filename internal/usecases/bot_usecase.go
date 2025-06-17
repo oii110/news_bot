@@ -12,13 +12,13 @@ import (
 )
 
 type BotUsecase struct {
-	bot                 *tgbotapi.BotAPI
+	bot                 BotAPIInterface
 	subscriptionUsecase SubscriptionUsecaseInterface
 	newsUsecase         NewsUsecaseInterface
 	categories          []string
 }
 
-func NewBotUsecase(bot *tgbotapi.BotAPI, subUsecase SubscriptionUsecaseInterface, newsUsecase NewsUsecaseInterface, categories []string) *BotUsecase {
+func NewBotUsecase(bot BotAPIInterface, subUsecase SubscriptionUsecaseInterface, newsUsecase NewsUsecaseInterface, categories []string) *BotUsecase {
 	return &BotUsecase{
 		bot:                 bot,
 		subscriptionUsecase: subUsecase,
@@ -27,9 +27,14 @@ func NewBotUsecase(bot *tgbotapi.BotAPI, subUsecase SubscriptionUsecaseInterface
 	}
 }
 
+type BotAPIInterface interface {
+	Send(c tgbotapi.Chattable) (tgbotapi.Message, error)
+	GetUpdatesChan(config tgbotapi.UpdateConfig) tgbotapi.UpdatesChannel
+	Self() tgbotapi.User
+}
+
 func (u *BotUsecase) StartBot(ctx context.Context) {
-	u.bot.Debug = true
-	log.Printf("Бот %s запущен!", u.bot.Self.UserName)
+	log.Printf("Бот %s запущен!", u.bot.Self().UserName)
 
 	go u.StartNewsChecker(ctx)
 

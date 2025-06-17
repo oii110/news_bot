@@ -15,3 +15,12 @@ type NewsUsecaseInterface interface {
 	GetNewsByCategory(ctx context.Context, category string) ([]entities.Article, error)
 	GetNewArticles(ctx context.Context, category string, maxArticles int) ([]entities.Article, error)
 }
+
+type NewsServiceInterface interface {
+	GetNewsByCategory(ctx context.Context, category string) ([]entities.Article, error)
+}
+
+type SentArticlesRepositoryInterface interface {
+	IsArticleSent(ctx context.Context, url string) (bool, error)
+	SaveSentArticle(ctx context.Context, article *entities.Article, category string) error
+}

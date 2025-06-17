@@ -7,4 +7,4 @@ RUN go mod download
 
 COPY . .
 
-CMD ["go", "test", "./test/internal/usecases/..."]
+CMD ["go", "test", "./test/internal/usecases_test/..."]
