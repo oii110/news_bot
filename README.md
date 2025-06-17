@@ -10,16 +10,16 @@
 
 # Определение проблемы
 
-Пользователи сталкиваются с неудобствами при поиске актуальных новостей по интересующим их темам, так как им приходится вручную проверять множество источников. Отсутствие персонализированных уведомлений приводит к пропуску важных обновлений.
+Пользователи сталкиваются с неудобствами при поиске актуальных новостей по интересующим их темам, так как им приходится вручную проверять множество различных источников. Отсутствие персонализированных уведомлений может привести к пропуску важных новостей и лишней трате времени.
 
 ## Выработка требований
 
 ### Пользовательские истории
-1. **Как пользователь, я хочу подписаться на определенные категории новостей (например, технологии, бизнес), чтобы получать только релевантные статьи.**
+1. Как пользователь, я хочу подписаться на определенные категории новостей (например, технологии, бизнес), чтобы получать только релевантные статьи.
    - Задача: Использовать команду `/add <category>` для подписки и получать подтверждение.
-2. **Как пользователь, я хочу просматривать новости по выбранной категории по запросу, чтобы оставаться в курсе интересующих меня тем.**
+2. Как пользователь, я хочу просматривать новости по выбранной категории по запросу, чтобы оставаться в курсе интересующих меня тем.
    - Задача: Использовать команду `/news <category>` для получения до 5 последних статей с заголовком, описанием и ссылкой.
-3. **Как пользователь, я хочу периодически получать новости по моим подпискам, чтобы не проверять их вручную.**
+3. Как пользователь, я хочу периодически получать новости по моим подпискам, чтобы не проверять их вручную.
    - Задача: Автоматически получать новые статьи каждые 5 минут для подписанных категорий.
 
 ### Оценка пользователей
@@ -196,7 +196,7 @@
 
 ## Схема базы данных
 
-![ER Diagram](images/er_diagram.png)
+![ER Diagram](images/er_diagram.png =250x)
 
 Обоснование: Индексы на `user_id` и `category` обеспечивают быстрый доступ. PostgreSQL поддерживает высокую нагрузку с репликами.
 
@@ -260,121 +260,51 @@
 - **MinIO**: Объектное хранилище для временных файлов.
 - **Prometheus/Grafana**: Мониторинг и алерты.
 
-## Unit-тестирование
+## Тестирование
 
-Проект включает комплексную систему unit-тестирования для основного сервиса Telegram Bot Service. Тесты написаны с использованием стандартного пакета `testing` в Go и библиотеки Testify для создания моков, обеспечивая высокое покрытие ключевой функциональности.
+Проект включает комплексную систему тестирования для сервиса Telegram Bot Service, охватывающую как unit-, так и интеграционные тесты, написанные с использованием стандартного пакета `testing` в Go и библиотеки Testify для создания моков.
 
-### Структура тестов
-- **tgbot/test/internal/usecases/**:
+### Unit-тестирование
+- **Расположение**: `test/internal/usecases_test/`.
   - `bot_usecase_test.go`: Тесты для методов обработки команд, форматирования новостей и логики автоматической отправки.
-  - `mock_subscription_usecase.go`: Моки для интерфейса `SubscriptionUsecaseInterface`.
-  - `mock_news_usecase.go`: Моки для интерфейса `NewsUsecaseInterface`.
+  - `news_usecase_test.go`: Тесты для получения новостей.
+  - `subscription_usecase_test.go`: Тесты для управления подписками.
+- **Особенности**:
+  - Используются моки для объектов Telegram Bot API (`tgbotapi.BotAPI`, `tgbotapi.Message`).
+  - Проверка обработчиков команд (`/start`, `/add`, `/news`, `/mysubs`, `/help`) в методе `HandleCommand`.
+  - Тестирование методов `FormatArticle` и `CheckAndSendNews` с различными сценариями.
+  - Изоляция от внешних зависимостей (Telegram API, News API, PostgreSQL) с помощью Testify.
+  - Обработка краевых случаев (пустой список категорий, ошибки API).
+- **Запуск**:
+  ```bash
+  # Запуск всех unit-тестов
+  make unit-test
+  # Прямо через Docker Compose
+  docker-compose run bot go test -v ./test/internal/usecases_test -run TestBotUsecase
+  # Локальный запуск
+  go test -v ./test/internal/usecases_test -run TestBotUsecase
+  ```
 
-### Основные возможности тестирования
-- **Telegram Bot Service тесты**:
-  - Моки для объектов Telegram Bot API (`tgbotapi.BotAPI`, `tgbotapi.Message`).
-  - Тестирование обработчиков команд (`/start`, `/add`, `/news`, `/mysubs`, `/help`) в методе `HandleCommand`.
-  - Проверка логики обработки неизвестных команд.
-  - Тестирование метода `FormatArticle` для корректного форматирования новостей в Markdown.
-  - Тестирование метода `CheckAndSendNews` для сценариев с новыми статьями и их отсутствием.
-  - Моки для внешних зависимостей (`SubscriptionUsecase`, `NewsUsecase`) с использованием Testify.
-  - Проверка краевых случаев (например, пустой список категорий, ошибки API).
-
-### Запуск unit-тестов
-```bash
-# Запуск всех unit-тестов
-make unit-test
-
-# Прямо через Docker Compose
-docker-compose run bot go test -v ./test/internal/usecases -run TestBotUsecase
-
-# Локальный запуск
-go test -v ./test/internal/usecases -run TestBotUsecase
-```
-
-### Конфигурация тестов
-- Тесты используют стандартные возможности Go без дополнительных конфигурационных файлов.
-- Моки генерируются с помощью Testify, обеспечивая изоляцию от внешних сервисов (Telegram API, News API, PostgreSQL).
-- Тесты выполняются быстро, так как не требуют сетевых вызовов или работы с реальными файлами.
-
-### Пример unit-теста
-```go
-func TestHandleCommand(t *testing.T) {
-    mockSubUsecase := &MockSubscriptionUsecase{}
-    mockNewsUsecase := &MockNewsUsecase{}
-    bot, _ := tgbotapi.NewBotAPIWithClient("token", "endpoint", &http.Client{})
-    usecase := NewBotUsecase(bot, mockSubUsecase, mockNewsUsecase, []string{"technology"})
-    update := tgbotapi.Update{
-        Message: &tgbotapi.Message{
-            Chat: &tgbotapi.Chat{ID: 123},
-            Text: "/start",
-        },
-    }
-    usecase.HandleCommand(context.Background(), update)
-    // Проверяем, что бот отправил правильное сообщение
-    if len(bot.Messages) == 0 || bot.Messages[0].Text != "Здравствуйте! Данный бот предназначен для получения новостей..." {
-        t.Errorf("Expected welcome message, got: %v", bot.Messages)
-    }
-}
-```
-
-## Интеграционное тестирование
-
-Проект включает интеграционные тесты для проверки взаимодействия между Telegram Bot Service, Telegram API и внешними зависимостями, используя Telegram Dummy Server (TDS) для эмуляции Telegram API.
-
-### Типы интеграционных тестов
-- **Полный workflow тестирование**:
-  - Тест полного цикла взаимодействия пользователя: подписка на категорию (`/add`), запрос новостей (`/news`), автоматическая отправка новостей (`CheckAndSendNews`).
-  - Проверка взаимодействия Telegram Bot Service с TDS (эмуляция Telegram API).
-  - Проверка обработки ошибок (например, неверная категория, сбои News API).
-- **Database и News API интеграционные тесты**:
-  - Тестирование реальных запросов к PostgreSQL (в тестовой БД через Docker).
-  - Моки для News API для возврата предопределенных статей.
-  - Валидация отправленных сообщений через TDS.
-
-### Особенности интеграционных тестов
-- Использование TDS для эмуляции Telegram API, что позволяет проверять реальную отправку сообщений без сетевых вызовов к Telegram.
-- Тесты создают временную тестовую БД в Docker, минимизируя зависимости.
-- Моки для `SubscriptionUsecase` и `NewsUsecase` позволяют изолировать внешние API.
-- Тесты медленнее unit-тестов из-за запуска TDS и Docker, но обеспечивают проверку реального взаимодействия.
-
-### Запуск интеграционных тестов
-```bash
-# Запуск всех интеграционных тестов
-make integration-test
-
-# Прямо через Docker Compose
-docker-compose run bot go test -v ./test/internal/usecases -run TestBotCommands
-
-# Локальный запуск
-go test -v ./test/internal/usecases -run TestBotCommands
-```
-
-### Пример интеграционного теста
-```go
-func TestBotCommands(t *testing.T) {
-    tds := NewTDS()
-    ts := httptest.NewServer(tds)
-    defer ts.Close()
-    tgbotapi.APIEndpoint = ts.URL + "/bot%s/%s"
-    bot, _ := tgbotapi.NewBotAPIWithClient("token", tgbotapi.APIEndpoint, &http.Client{})
-    mockSubUsecase := &MockSubscriptionUsecase{}
-    mockNewsUsecase := &MockNewsUsecase{}
-    usecase := NewBotUsecase(bot, mockSubUsecase, mockNewsUsecase, []string{"technology"})
-    mockSubUsecase.On("SaveSubscription", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-    err := SendMsgToBot(123, "/add technology")
-    if err != nil {
-        t.Fatalf("SendMsgToBot error: %v", err)
-    }
-    time.Sleep(50 * time.Millisecond)
-    tds.Lock()
-    if len(tds.Answers[123]) == 0 || tds.Answers[123][0] != "Вы успешно подписались на категорию 'technology'!" {
-        t.Errorf("Expected subscription confirmation, got: %v", tds.Answers)
-    }
-    tds.Unlock()
-}
-```
-
+### Интеграционное тестирование
+- **Расположение**: `test/internal/integration_test/`.
+  - `integration_test.go`: Тесты полного цикла взаимодействия и взаимодействия с базой данных.
+- **Особенности**:
+  - Создание временной тестовой базы данных PostgreSQL для каждого теста.
+  - Использование моков для News API с предопределенными статьями.
+  - Тестирование полного workflow: подписка (`/add`), запрос новостей (`/news`), автоматическая отправка (`CheckAndSendNews`).
+  - Проверка обработки ошибок (неверная категория, сбои API).
+  - Автоматическое создание и удаление тестовой базы данных после выполнения тестов.
+- **Пример теста**:
+  - Тест `TestSaveAndCheckSentArticle` проверяет сохранение и проверку отправленных статей.
+- **Запуск**:
+  ```bash
+  # Запуск всех интеграционных тестов
+  make integration-test
+  # Прямо через Docker Compose
+  docker-compose run bot go test -v ./test/internal/integration_test -run TestBotCommands
+  # Локальный запуск
+  go test -v ./test/internal/integration_test -run TestBotCommands
+  ```
 ## Сборка
 
 - `Dockerfile`, `docker-compose.yml`, `Makefile` обеспечивают сборку, тестирование и запуск через:
