@@ -196,7 +196,6 @@
 
 ## Схема базы данных
 
-![ER Diagram](images/er_diagram.png)
 <img src="images/er_diagram.png" width="250">
 
 Обоснование: Индексы на `user_id` и `category` обеспечивают быстрый доступ. PostgreSQL поддерживает высокую нагрузку с репликами.
