@@ -140,7 +140,6 @@
 
 ## Диаграмма C4 model |
 ![ER Diagram](images/с4modelcomments.drawio.png)
-<img src="images/с4modelcomments.drawio.png" width="250">
 
 #### Описание взаимодействий
 - Пользователь отправляет команды (`/start`, `/add`, `/news`, `/mysubs`, `/help`) через Telegram.
