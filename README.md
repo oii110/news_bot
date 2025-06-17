@@ -140,7 +140,6 @@
 
 ## Диаграмма C4 model |
 ![ER Diagram](images/с4modelcomments.drawio.png)
-<img src="images/с4modelcomments.drawio.png" width="250">
 
 #### Описание взаимодействий
 - Пользователь отправляет команды (`/start`, `/add`, `/news`, `/mysubs`, `/help`) через Telegram.
@@ -180,6 +179,7 @@
 - Масштабируемость: Поддержка 100 000 пользователей.
 
 ## Схема базы данных
+
 
 <img src="images/er_diagram.png2" width="500">
 
@@ -262,11 +262,8 @@
   - Обработка краевых случаев (пустой список категорий, ошибки API).
 - **Запуск**:
   ```bash
-  # Запуск всех unit-тестов
   make unit-test
-  # Прямо через Docker Compose
   docker-compose run bot go test -v ./test/internal/usecases_test -run TestBotUsecase
-  # Локальный запуск
   go test -v ./test/internal/usecases_test -run TestBotUsecase
   ```
 
@@ -283,11 +280,8 @@
   - Тест `TestSaveAndCheckSentArticle` проверяет сохранение и проверку отправленных статей.
 - **Запуск**:
   ```bash
-  # Запуск всех интеграционных тестов
   make integration-test
-  # Прямо через Docker Compose
   docker-compose run bot go test -v ./test/internal/integration_test -run TestBotCommands
-  # Локальный запуск
   go test -v ./test/internal/integration_test -run TestBotCommands
   ```
 ## Сборка
