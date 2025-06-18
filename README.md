@@ -138,8 +138,9 @@
   - База данных: ~12 ГБ за 5 лет.
   - Временные файлы: 20-50 МБ с очисткой.
 
-## Диаграмма C4 model |
-![ER Diagram](images/с4modelcomments.drawio.png)
+## Диаграммы C4 model 
+![ER Diagram](images/с4-1.png)
+![ER Diagram](images/с4-2.png)
 
 #### Описание взаимодействий
 - Пользователь отправляет команды (`/start`, `/add`, `/news`, `/mysubs`, `/help`) через Telegram.
