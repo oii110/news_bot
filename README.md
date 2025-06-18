@@ -139,8 +139,8 @@
   - Временные файлы: 20-50 МБ с очисткой.
 
 ## Диаграммы C4 model 
-![ER Diagram](images/с4-1.png)
-![ER Diagram](images/с4-2.png)
+![ER Diagram](images/c4-1.png)
+![ER Diagram](images/c4-2.png)
 
 #### Описание взаимодействий
 - Пользователь отправляет команды (`/start`, `/add`, `/news`, `/mysubs`, `/help`) через Telegram.
